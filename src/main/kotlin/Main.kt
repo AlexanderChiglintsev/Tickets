@@ -1,8 +1,4 @@
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlin.random.Random
-import kotlin.random.nextInt
+import kotlinx.coroutines.*
 
 fun main() {
     println("Количество киосков:")
@@ -34,28 +30,32 @@ fun main() {
 }
 
 private suspend fun startSelling(shop: TicketShop) {
-    var remainingTickets: Int
-    do {
-        delay(100 * Random.nextInt(2..15).toLong())
-        remainingTickets = shop.buyTicket()
-    } while (remainingTickets > 0)
+    withContext(Dispatchers.Default) {
+        var remainingTickets: Int
+        do {
+            delay(600)
+            remainingTickets = shop.buyTicket()
+        } while (remainingTickets > 0)
+    }
 }
 
 private suspend fun checkRemainingTickets(ticketShops: MutableList<TicketShop>) {
-    do {
-        println("<------ Информация по оставшимся билетам ------>")
+    withContext(Dispatchers.Default) {
+        do {
+            println("<------ Информация по оставшимся билетам ------>")
 
-        var allRemainingTickets = 0
-        for (i in 0 until ticketShops.size) {
-            val currentTicketCount = ticketShops[i].getTicketCount()
-            println("Киоск ${i + 1} - осталось билетов: $currentTicketCount")
-            allRemainingTickets += currentTicketCount
-        }
-        println("Всего осталось билетов: $allRemainingTickets\n")
+            var allRemainingTickets = 0
+            for (i in 0 until ticketShops.size) {
+                val currentTicketCount = ticketShops[i].getTicketCount()
+                println("Киоск ${i + 1} - осталось билетов: $currentTicketCount")
+                allRemainingTickets += currentTicketCount
+            }
+            println("Всего осталось билетов: $allRemainingTickets\n")
 
-        if (allRemainingTickets == 0) println("Все билеты распроданы!")
-        delay(1000)
-    } while (allRemainingTickets > 0)
+            if (allRemainingTickets == 0) println("Все билеты распроданы!")
+            delay(1000)
+        } while (allRemainingTickets > 0)
+    }
 }
 
 private fun getCount(): Int {
